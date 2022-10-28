@@ -1,29 +1,42 @@
-import React, {useState, useEffect} from 'react';
+import React, {useCallback, useState, useEffect} from 'react';
 import { useTelegram } from '../hooks/useTelegram';
 import './Form.css';
 
 const Form = () => {
     const [country, setCountry] = useState('')
     const [street, setStreet] = useState('')
-    const [subject, setSubject] = useState('')
+    const [subject, setSubject] = useState('physical')
     const {tg} = useTelegram();
 
-    useEffect(()=> {
-        tg.MainButton.setParams({
-    text: 'Отправить данные'
-})
-    },[])
+    const onSendData = useCallback(() => {
+        const data = {
+            country,
+            street,
+            subject
+        }
+        tg.sendData(JSON.stringify(data));
+    }, [country, street, subject])
 
-    useEffect(()=> {
-        if (!street || !country) {
+    useEffect(() => {
+        tg.onEvent('mainButtonClicked', onSendData)
+        return () => {
+            tg.offEvent('mainButtonClicked', onSendData)
+        }
+    }, [onSendData])
+
+    useEffect(() => {
+        tg.MainButton.setParams({
+            text: 'Отправить данные'
+        })
+    }, [])
+
+    useEffect(() => {
+        if(!street || !country) {
             tg.MainButton.hide();
         } else {
             tg.MainButton.show();
         }
-           },[])
-
-
-
+    }, [country, street])
 
     const onChangeCountry = (e) => {
         setCountry(e.target.value)
@@ -36,6 +49,7 @@ const Form = () => {
     const onChangeSubject = (e) => {
         setSubject(e.target.value)
     }
+
     return (
         <div className={'form'}>
              <h3 >Введите ваши данные</h3>
