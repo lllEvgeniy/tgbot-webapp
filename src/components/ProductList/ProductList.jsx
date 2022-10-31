@@ -31,13 +31,7 @@ const ProductList = () => {
             totalPrice: getTotalPrice(addedItems),
             queryId,
         }
-        fetch('http://85.119.146.179:8000/web-data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
+        tg.sendData(JSON.stringify(data));
     }, [addedItems])
 
     useEffect(() => {
@@ -50,15 +44,12 @@ const ProductList = () => {
     const onAdd = (product) => {
         const alreadyAdded = addedItems.find(item => item.id === product.id);
         let newItems = [];
-
         if(alreadyAdded) {
             newItems = addedItems.filter(item => item.id !== product.id);
         } else {
             newItems = [...addedItems, product];
         }
-
         setAddedItems(newItems)
-
         if(newItems.length === 0) {
             tg.MainButton.hide();
         } else {
