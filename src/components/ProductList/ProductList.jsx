@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './ProductList.css';
 import ProductItem from "../ProductItem/ProductItem";
-import {useTelegram} from "../hooks/useTelegram";
+import {useTelegram} from "../../hooks/useTelegram";
 import {useCallback, useEffect} from "react";
 
 const products = [
@@ -32,7 +32,7 @@ const ProductList = () => {
             queryId,
         }
         tg.sendData(JSON.stringify(data));
-    }, [])
+    }, [addedItems])
 
     useEffect(() => {
         tg.onEvent('mainButtonClicked', onSendData)
@@ -44,12 +44,15 @@ const ProductList = () => {
     const onAdd = (product) => {
         const alreadyAdded = addedItems.find(item => item.id === product.id);
         let newItems = [];
+
         if(alreadyAdded) {
             newItems = addedItems.filter(item => item.id !== product.id);
         } else {
             newItems = [...addedItems, product];
         }
+
         setAddedItems(newItems)
+
         if(newItems.length === 0) {
             tg.MainButton.hide();
         } else {
